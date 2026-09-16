@@ -1,0 +1,12 @@
+{
+  "name": "datacards-pair",
+  "interface": { "displayName": "DataCards pair" },
+  "plugins": [
+    {
+      "name": "datacards-pair",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Education & Research"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "datacards-pair",
+  "owner": {
+    "name": "cavorit",
+    "email": "felix.koppe@cavorit.de"
+  },
+  "metadata": {
+    "description": "Pair programming protocol for DataCards",
+    "version": "0.0.19"
+  },
+  "plugins": [
+    {
+      "name": "datacards-pair",
+      "description": "Pair programming protocol for DataCards",
+      "source": "./",
+      "skills": [
+        "./skills"
+      ]
+    }
+  ]
+}

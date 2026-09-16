@@ -1,0 +1,11 @@
+{
+  "name": "datacards-pair",
+  "version": "0.0.19",
+  "description": "Pair programming protocol for DataCards",
+  "author": {
+    "name": "cavorit",
+    "email": "felix.koppe@cavorit.de"
+  },
+  "repository": "https://github.com/cavorit/skills",
+  "skills": "./skills/"
+}
