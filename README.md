@@ -53,7 +53,7 @@ Add the marketplace and install the plugin:
 
 ```
 /plugin marketplace add cavorit/skills
-/plugin install datacards-pair@datacards-pair
+/plugin install datacards-skills@datacards-pair
 ```
 
 To opt in to auto-updates (recommended), so you always get the latest version:

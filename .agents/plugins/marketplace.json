@@ -1,6 +1,6 @@
 {
-  "name": "datacards-pair",
-  "interface": { "displayName": "DataCards pair" },
+  "name": "datacards-skills",
+  "interface": { "displayName": "DataCards Skills" },
   "plugins": [
     {
       "name": "datacards-pair",
