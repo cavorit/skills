@@ -18,6 +18,9 @@ catalog: `dc.data.publish("namespace.key", value)` in one notebook,
 `dc.data.consume("namespace.key")`.
 Every publish/consume pair is an edge of the project's process graph, which
 the DataCards canvas draws as notebook nodes and variable nodes.
+You must only use dc.data.publish when sharing data with other notebooks is neccessary. 
+When using the same data inside a notebook use the local variable instead.
+You must use `dc.data.publish/consume` only in Notebook Cell Code, never in the repl. 
 
 Notebooks can place cell outputs as *cards*: each cell appears as a card in
 the notebook's Exposé view, and cards can be placed on *decks*, grid-based
@@ -29,6 +32,7 @@ templates are owned by the DataCards server, not by any notebook file.
 In DataCards notebooks `import datacards as dc` is the convention. The
 `datacards` package re-exports the marimo API, so `dc.ui`, `dc.md` and
 `dc.data` are marimo's; `import marimo as mo` works the same way.
+You must use `dc` instead of `mo` in notebook cell code.
 
 ### Connecting to a DataCards project
 
