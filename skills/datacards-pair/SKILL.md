@@ -76,8 +76,9 @@ below:
   to a notebook, which inserts and runs the template's cells there.
 - **Screenshots** - `screenshot(cell)`, `screenshot_deck(deck_id)` and
   `screenshot_graph()` capture a cell's output, a deck as on its own page, and
-  the process graph on the canvas as PNG; `close_screenshot_session()` closes
-  the headless browser.
+  the process graph on the canvas as PNG. The headless browser behind them is
+  closed when the `execute-code.sh` call finishes; `close_screenshot_session()`
+  releases it earlier.
 
 These methods are `async`, apply immediately on the DataCards server (they are
 not queued like cell edits) and work inside or outside `cm.get_context()`.
@@ -414,11 +415,13 @@ tpl = await ctx.add_template_to_deck("overview", "integer-slider")
 result = await ctx.assign_template_to_notebook("overview", tpl, "nb.py")
 # or: await ctx.assign_template_to_notebook("overview", tpl, new_notebook="controls")
 
-# Screenshots (headless Chromium; needs `playwright` + chromium):
+# Screenshots (headless Chromium; needs `playwright` + chromium). The
+# browser is shared by every context of this execution and is closed
+# automatically when the execution finishes:
 png = await ctx.screenshot("chart")  # one cell's output
 png = await ctx.screenshot_deck("overview")  # the deck on its own page
 png = await ctx.screenshot_graph()  # the process graph on the canvas
-await ctx.close_screenshot_session()  # when used outside `async with`
+await ctx.close_screenshot_session()  # optional: release it early
 ```
 
 - **Cards reference cells by notebook path** - a cell card id is
@@ -449,6 +452,11 @@ await ctx.close_screenshot_session()  # when used outside `async with`
   `ValueError` for a bad position or size; `ScreenshotError` for a missing
   browser or a page that did not render. Use `help(ctx.add_card_to_deck)`
   and friends for the full argument lists.
+- **One browser per execution** - screenshots run a headless Chromium
+  (several hundred MB) inside the notebook kernel. It is closed when the
+  `execute-code.sh` call returns, so batch the screenshots you need into one
+  execution rather than one execution per capture; each execution that
+  screenshots relaunches the browser (a few seconds).
 
 ## References
 
