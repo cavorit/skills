@@ -34,7 +34,8 @@ is fine as long as the user sees that something is running and the result is
 smooth afterwards. When something is too slow, do not move it into a custom
 frontend:
 
-- Compute once and cache (a file in the project folder, `dc.persistent_cache`).
+- Compute once and cache (see [Files and storage](#files-and-storage) for where
+  cache files go).
 - Pre-render what would otherwise be animated live.
 - Show progress while it runs.
 
