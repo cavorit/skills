@@ -72,12 +72,52 @@ frontend:
   end-to-end run and the reaction of the decks to a control in the browser
   are unverified, and ask the user to try them.
 
-## The project folder
+## Files and storage
 
-The project is a git workspace that the platform saves automatically.
-Everything in the project folder ends up in that history.
+The project workspace is a git repository. DataCards commits and pushes it
+automatically, so everything in it ends up in the project's history.
 
-- Put caches, downloaded data and database files in a folder that is listed
-  in `.gitignore`. Create the `.gitignore` before writing the first file.
-- Prefer the packages the image already has. Tell the user in the handover
-  which packages you added with `ctx.packages.add()`.
+**Keep large and frequently changing files out of git.** Caches, downloaded
+data, rendered media and database files do not belong in the history. An
+SQLite database is the typical mistake: it changes on every write and brings
+`-wal` and `-shm` files with it.
+
+- Write such files to a temporary directory outside the workspace, or to a
+  folder in the workspace that is listed in `.gitignore`. Create the
+  `.gitignore` entry before writing the first file.
+- Treat these files as ephemeral. A new sandbox starts without them. On a
+  cold start, the first execution of every kernel must recreate what it needs
+  without user interaction: check whether the file exists and rebuild or
+  download it if not. Never rely on a file that only an earlier session
+  produced.
+
+**Storage that must last and does not fit git** (large datasets, databases,
+results that are expensive to recompute) goes to S3 object storage:
+
+1. Ask the user to provision an S3 bucket for the project.
+2. Ask them to hand over the credentials, or to put them in a `.env` file in
+   the workspace. List `.env` in `.gitignore` so the credentials are not
+   committed. Never write credentials into notebook code.
+3. Use the bucket from notebook code with `obstore`:
+
+```python
+import os
+
+import obstore
+from obstore.store import S3Store
+
+store = S3Store(
+    os.environ["S3_BUCKET"],
+    endpoint=os.environ["S3_ENDPOINT"],
+    access_key_id=os.environ["S3_ACCESS_KEY_ID"],
+    secret_access_key=os.environ["S3_SECRET_ACCESS_KEY"],
+)
+obstore.put(store, "cache/result.parquet", data)        # bytes
+data = obstore.get(store, "cache/result.parquet").bytes()
+```
+
+The variable names are an example; use the ones the user gives you and load
+the `.env` file into the environment first.
+
+Packages: prefer the packages the image already has. Tell the user in the
+handover which packages you added with `ctx.packages.add()`.

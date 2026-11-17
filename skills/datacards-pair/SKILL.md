@@ -60,6 +60,18 @@ further down and in the reference files. The reasons are in
    when a second notebook really consumes the value; inside a notebook use
    the local variable. Use `dc.data.publish/consume` only in notebook cell
    code, never in the scratchpad.
+7. **The workspace is a git repository.** DataCards commits and pushes it
+   automatically. Never store large files or files that change often in it
+   unprotected: use a temporary directory outside the workspace, or a folder
+   listed in `.gitignore`. This holds especially for SQLite databases and
+   their `-wal`/`-shm` files. Treat all such files as ephemeral: on a cold
+   start, the first execution of every kernel must recreate them without
+   user interaction.
+8. **Lasting storage that does not fit git goes to object storage.** Ask the
+   user to provision an S3 bucket and hand over the credentials, or to put
+   them in a `.env` file in the workspace (listed in `.gitignore`). Use it
+   from notebook code with `from obstore.store import S3Store`. See
+   [product.md](reference/product.md#files-and-storage).
 
 ### Work loop
 
