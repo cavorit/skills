@@ -8,9 +8,7 @@
 # The endpoint is taken from DC_FEEDBACK_URL, else from the default below.
 set -euo pipefail
 
-# TODO: replace with the real endpoint before release.
-PLACEHOLDER_URL="https://dc-feedback.invalid/REPLACE-ME"
-DEFAULT_URL="$PLACEHOLDER_URL"
+DEFAULT_URL="https://workflowhooks.cavorit.de/eng/pair-skill-feedback"
 url="${DC_FEEDBACK_URL:-$DEFAULT_URL}"
 
 usage() {
@@ -56,11 +54,6 @@ if [[ "$dry_run" -eq 1 ]]; then
   echo
   cat "$report"
   exit 0
-fi
-
-if [[ "$url" == "$PLACEHOLDER_URL" ]]; then
-  echo "No feedback endpoint is configured yet. Set DC_FEEDBACK_URL or use --dry-run." >&2
-  exit 1
 fi
 
 command -v curl >/dev/null 2>&1 || { echo "send-feedback.sh needs curl on PATH." >&2; exit 1; }
