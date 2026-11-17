@@ -40,9 +40,3 @@ yourself.
   publish failed.
 - **`No active sessions`** from the script: no notebook is open. In an empty
   project a human has to create the first notebook.
-
-## After a restart of the project
-
-Cell ids may have changed and deck cards may point at nothing. Remove the
-empty cards and lay the deck out again from the build script
-(see [decks.md](decks.md#keep-a-deck-rebuildable)).

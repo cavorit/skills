@@ -42,11 +42,13 @@ png = await ctx.screenshot_graph()  # the process graph on the canvas
 await ctx.close_screenshot_session()  # when used outside `async with`
 ```
 
-- **Cards reference cells by notebook path** - a cell card id is
-  `"<notebook path>.py-<cell id>"`, where the path is relative to the
-  workspace root (`"nb.py-Hbol"` for a root notebook, `"sub/nb.py-Hbol"` for
-  one in a folder); pass the cell (id, name, index) and `cm` derives the id
-  from the current notebook. Pass the same relative path as `notebook_file`
+- **Cards reference cells by notebook path and `dc_id`** - a cell card id is
+  `"<notebook path>.py-<dc_id>"`, where the path is relative to the
+  workspace root (`"sub/nb.py-<dc_id>"` for a notebook in a folder). The
+  `dc_id` is a stable identifier every cell carries (`cell.config.dc_id`);
+  it is not marimo's cell id and does not change when the project restarts.
+  Pass the cell (id, name, index) and `ctx` derives the card id from the
+  current notebook. Pass the same relative path as `notebook_file`
   to `assign_template_to_notebook`. Template cards are `"template:<uuid>"`.
 - **Decks are bounded** - a card must fit in `columns` x `rows` and an
   explicit `position=` must not overlap another card; `cm` raises
@@ -93,16 +95,12 @@ await ctx.close_screenshot_session()  # when used outside `async with`
   current state of the deck, so free the target spot first when you
   rearrange.
 
-## Keep a deck rebuildable
+## Finding deck cells again
 
-Deck cards point at `notebook path + cell id`. Cell ids are not stable: a
-restart of the project or recreating a cell gives new ids, and the old cards
-stay behind as empty shells.
-
-- **Name every cell that goes on a deck** (`name=` on `create_cell` /
-  `edit_cell`) and address it by name.
-- **Keep the layout in a build script**: deck id, cell name, position and
-  size for every card. With it a deck can be laid out again in one pass.
+A deck card stays attached to its cell across restarts through the cell's
+`dc_id`, so a deck does not have to be laid out again after a restart. Give
+cells that go on a deck a name (`name=` on `create_cell` / `edit_cell`) or
+at least a title, so you and the user recognize them.
 
 ## Getting a screenshot back
 
