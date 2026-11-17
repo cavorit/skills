@@ -6,6 +6,12 @@ and if you're unsure whether a change is worthwhile, ask the user.
 
 ## Cell names
 
+> **DataCards:** name every cell that is placed on a deck. Deck cards point
+> at cell ids, which change when a project restarts; names are what lets you
+> find the cells again and rebuild the deck. See
+> [decks.md](decks.md#keep-a-deck-rebuildable). The text below applies to
+> cells that are not on a deck.
+
 Low priority unless the user asks. `setup` and cells defining
 functions/classes are auto-named by marimo. Beyond that, naming is optional.
 Note that naming markdown cells clutters the UI by showing the cell header

@@ -9,7 +9,8 @@ incorrectly.
 - Pass the discovered `--url` unchanged; `null` means no address was reachable.
 - With one open notebook, the script resolves its session.
 - Use `--file` for an exact, stable file key or path. It resolves the current
-  session on every call.
+  session on every call. The value must equal the path the script lists for
+  the session; a shortened or relative name does not match.
 - Use `--session` for an exact active session ID; it goes stale on reconnect.
 - The selectors are mutually exclusive. Preserve supplied values; never guess.
 
@@ -44,7 +45,12 @@ bash scripts/execute-code.sh --url http://localhost:2718 /tmp/code.py
 - **`[]` from discover-servers.sh** - nothing is registered. Only servers
   started with `--no-token` register; otherwise ask the user for the URL, or
   start marimo with the project's normal tooling.
-- **No active sessions on the server** - open the notebook in the browser.
+- **No active sessions on the server** - open the notebook in the browser. In
+  an empty DataCards project there is no notebook to attach to: ask the user
+  to create the first one.
+- **HTTP 403 before reaching the project** - the agent's own environment may
+  restrict outbound hosts (for example the domain allowlist of a desktop
+  app). Ask the user to allow the project's host there.
 - **No active session matches `--file`** - check the exact file key against the
   available paths printed by the script.
 - **Multiple sessions on server** - several notebooks are open; rerun with the

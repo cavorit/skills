@@ -15,14 +15,11 @@ DataCards is a platform that orchestrates multiple marimo notebooks into a
 graph of notebooks. A project is a workspace of notebooks served by one marimo
 server behind the DataCards server. Notebooks exchange data through the data
 catalog: `dc.data.publish("namespace.key", value)` in one notebook,
-`dc.data.consume("namespace.key")`.
+`dc.data.consume("namespace.key")` in another.
 Every publish/consume pair is an edge of the project's process graph, which
 the DataCards canvas draws as notebook nodes and variable nodes.
-You must only use dc.data.publish when sharing data with other notebooks is neccessary. 
-When using the same data inside a notebook use the local variable instead.
-You must use `dc.data.publish/consume` only in Notebook Cell Code, never in the repl. 
 
-Notebooks can place cell outputs as *cards*: each cell appears as a card in
+Notebooks place cell outputs as *cards*: each cell appears as a card in
 the notebook's Exposé view, and cards can be placed on *decks*, grid-based
 visual dashboards (`columns` x `rows` units) that sit next to the graph on the
 canvas. A deck card shows the live output of its cell, so a deck composes a
@@ -34,19 +31,94 @@ In DataCards notebooks `import datacards as dc` is the convention. The
 `dc.data` are marimo's; `import marimo as mo` works the same way.
 You must use `dc` instead of `mo` in notebook cell code.
 
+### Product rules
+
+These rules describe how DataCards is meant to be used. Work that breaks them
+gets rejected even when it runs. They take precedence over the marimo guidance
+further down and in the reference files. The reasons are in
+[product.md](reference/product.md).
+
+1. **Build with DataCards, not inside it.** Controls come from the card store
+   (`ctx.list_templates()`) or `dc.ui.*` and sit on the deck as separate
+   cards. Never build one card that brings its own controls, state and logic
+   (a large anywidget or HTML/JavaScript block).
+2. **Logic is visible.** Computation and business logic live in notebook
+   cells. Data that crosses notebooks goes through `dc.data.publish` /
+   `dc.data.consume`, so the graph shows it.
+3. **Stay in the design system.** Look at the template list first and use the
+   existing building blocks. Build something custom only where no block
+   exists, and never give it its own color scheme: light and dark mode must
+   both work.
+4. **Ask before you trade a rule away.** When a requirement seems to need
+   something outside these rules (smooth animation, a missing component),
+   put the trade-off to the user before building. Do not decide alone and
+   mention it afterwards.
+5. **A notebook is a document.** Each notebook starts with a markdown cell
+   stating purpose, input and output. Domain logic, formulas and data sources
+   are explained in markdown; code comments are for coding detail only.
+6. **Publish only what another notebook needs.** Use `dc.data.publish` only
+   when a second notebook really consumes the value; inside a notebook use
+   the local variable. Use `dc.data.publish/consume` only in notebook cell
+   code, never in the scratchpad.
+
+### Work loop
+
+1. **Connect** and run the required first kernel command (below).
+2. **Survey the project before changing it.** List the notebooks (the
+   sessions on the project URL), read their cells (`ctx.cells`), list the
+   decks and their cards (`await ctx.list_decks()`), and look at the graph
+   (`await ctx.screenshot_graph()`). Reuse what exists and leave nothing
+   orphaned. If the project contains a briefing, plan or design notes, read
+   them.
+3. **Check feasibility from the kernel.** Test network access and fetch every
+   data source once from the kernel, not from your own environment: the two
+   can reach different hosts. Look at the shape and value range of the data
+   before setting thresholds and scales.
+4. **Plan, and ask where rule 4 applies.**
+5. **Build.** Read [decks.md](reference/decks.md) before placing cards and
+   [deck-design.md](reference/deck-design.md) before laying out a deck.
+6. **Verify** with the checklist below.
+7. **Hand over.** Say what you built, what you could not verify, and anything
+   you left behind (files, packages, an agent-caused error state).
+   If the `dc-feedback` skill is installed, offer to send lessons learned
+   from the session with it.
+
+### Verification checklist
+
+A green graph only means that no cell raised an exception.
+
+- **Run the cell itself.** A test in the scratchpad proves nothing about the
+  cell: the scratchpad shares already-imported modules with the kernel. Give
+  each cell the imports it needs, run it with `ctx.run_cell(...)` and check
+  `ctx.cells[...].status` and `.errors`.
+- **Check the values.** Compare formulas, thresholds, units and start values
+  with the briefing. A number that is always 0 or always 100 %, a point stuck
+  at the edge of a chart or an empty plot is a computation error, not a
+  layout problem.
+- **Look at the finished deck** with `await ctx.screenshot_deck(deck_id)`:
+  cut-off charts, double titles, overflowing controls and overlapping labels
+  only show there. Check that every card shows the cell you meant.
+- **Operate every control once** and see which number changes. A control
+  without a visible effect does not belong on the deck. With a selector, look
+  at every option.
+- **Name what you did not verify** in the handover (interaction in the
+  browser, light mode, a selection you never looked at).
+
 ### Connecting to a DataCards project
 
 The primary use case is a project running in the DataCards cloud. Its URL has
 the form `https://<host>/<team>/<project>/`; the project's "Pair with agent"
 dialog shows that URL together with a project token (`dc_sk_proj_...`). Pass
 the URL as `--url` and the token via `MARIMO_TOKEN` (preferred) or `--token`.
-All notebooks of a project are sessions on that one URL, so pass `--file` with the
-notebook's path when more than one notebook is open (the script lists the
-available sessions when the value does not match):
+All notebooks of a project are sessions on that one URL. With more than one
+notebook open, run the command once without a selector: it fails with the
+list of sessions (`<session id>  <path>`). Then pass `--file` with a path
+exactly as listed (a shortened name does not match), or `--session` with the
+id:
 
 ```bash
 MARIMO_TOKEN=dc_sk_proj_... bash /absolute/path/to/datacards-pair/scripts/execute-code.sh \
-  --url https://<host>/<team>/<project>/ --file analysis.py \
+  --url https://<host>/<team>/<project>/ --file <path as listed> \
   -c "import marimo._code_mode as cm; help(cm)"
 ```
 
@@ -55,37 +127,34 @@ contract) applies unchanged to each notebook of the project.
 
 ### DataCards functions in code mode
 
-Besides the marimo cell API, `cm` exposes the DataCards actions a human has in
-the frontend. Usage and rules are in
-[DataCards Decks, Cards and Screenshots](#datacards-decks-cards-and-screenshots)
-below:
+Besides the marimo cell API, the code-mode context (`ctx = cm.get_context()`)
+exposes the DataCards actions a human has in the frontend. They are methods of
+`ctx`, not of the `cm` module:
 
-- **Card title and size** - `create_cell(...)` and `edit_cell(...)` take
-  `title=` and `size=(width, height)` in grid units (`1..24` x `1..12`). The
-  size is the card's size in Exposé and its default size when added on a deck.
-- **Decks** - `list_decks()` and `get_deck(deck_id)` return the decks of the
-  project with their cards (`Deck`, `DeckCard`).
-- **Cards on decks** - `add_card_to_deck(deck_id, cell, position=, size=)`,
-  `edit_card_on_deck(deck_id, card, position=, size=)` and
-  `remove_card_from_deck(deck_id, card)` place, move or resize, and remove a
-  cell of this notebook on a deck.
-- **Templates** - `list_templates()`, `add_template_to_deck(deck_id,
-  template_id, ...)` and `assign_template_to_notebook(deck_id, card,
-  notebook_file=...)` or `new_notebook=...`: card-store templates are
-  ready-made cards (a slider, a chart, ...) placed on a deck and then assigned
-  to a notebook, which inserts and runs the template's cells there.
-- **Screenshots** - `screenshot(cell)`, `screenshot_deck(deck_id)` and
-  `screenshot_graph()` capture a cell's output, a deck as on its own page, and
-  the process graph on the canvas as PNG; `close_screenshot_session()` closes
-  the headless browser.
+- **Card title and size** - `ctx.create_cell(...)` and `ctx.edit_cell(...)`
+  take `title=` and `size=(width, height)` in grid units.
+- **Decks and cards** - `ctx.list_decks()`, `ctx.get_deck(...)`,
+  `ctx.add_card_to_deck(...)`, `ctx.edit_card_on_deck(...)`,
+  `ctx.remove_card_from_deck(...)`.
+- **Templates** - `ctx.list_templates()`, `ctx.add_template_to_deck(...)`,
+  `ctx.assign_template_to_notebook(...)`.
+- **Screenshots** - `ctx.screenshot(cell)`, `ctx.screenshot_deck(deck_id)`,
+  `ctx.screenshot_graph()`, `ctx.close_screenshot_session()`.
 
-These methods are `async`, apply immediately on the DataCards server (they are
-not queued like cell edits) and work inside or outside `cm.get_context()`.
-They need the request context of a code-mode execution, which is what
-`execute-code.sh` provides; they raise `DeckError` when called elsewhere.
+Usage, rules and how building blocks behave on a deck are in
+[decks.md](reference/decks.md).
 
-Use screenshot_deck(deck_id) when composing a dashboard ui from outputs. 
-Use screenshot_graph() to visually inspect the orchestration of notebooks and see which notebook publishes or consumes which variable.
+### Which reference to read when
+
+| When | Read |
+|------|------|
+| You want to know why a product rule exists, or how projects, notebooks and the sandbox work | [product.md](reference/product.md) |
+| Before placing cards, using templates or taking screenshots | [decks.md](reference/decks.md) |
+| Before laying out a deck | [deck-design.md](reference/deck-design.md) |
+| Before the first draft of a deck | [known-limitations.md](reference/known-limitations.md) |
+| Something hangs, times out or turns red | [troubleshooting.md](reference/troubleshooting.md) |
+| The script cannot reach or select a session | [execution-context.md](reference/execution-context.md) |
+
 
 ## marimo Notebooks
 
@@ -383,74 +452,20 @@ For designing custom visual or interactive output, see
 
 ## DataCards Decks, Cards and Screenshots
 
-In DataCards a notebook's cells appear as *cards*: on the Exposé view of the
-notebook and on *decks* (fixed grids of `columns` x `rows` units on the
-canvas). `cm` exposes the same actions a human has in the frontend. The deck,
-template and screenshot methods are `async`, apply immediately on the
-DataCards server, and work inside or outside `cm.get_context()` (they are not
-queued like cell edits):
-
-```python
-import marimo._code_mode as cm
-
-ctx = cm.get_context()
-async with ctx:
-    # Card title and footprint (grid units, 1..24 x 1..12); the size is
-    # the card's size in Exposé and its default size on a deck.
-    ctx.edit_cell("chart", title="Revenue", size=(4, 2))
-
-decks = await ctx.list_decks()  # Deck(id, columns, rows, cards, ...)
-deck = await ctx.get_deck("overview")
-
-# Place a cell of this notebook; position=None takes the first free spot.
-card = await ctx.add_card_to_deck("overview", "chart", position=(0, 0))
-await ctx.edit_card_on_deck("overview", card, position=(4, 0), size=(2, 2))
-await ctx.remove_card_from_deck("overview", card)
-
-# Card-store templates: place one, then assign it to a notebook, which
-# inserts and runs the template's cells there (like the "assign" button).
-templates = await ctx.list_templates()  # TemplateInfo(id, title, size)
-tpl = await ctx.add_template_to_deck("overview", "integer-slider")
-result = await ctx.assign_template_to_notebook("overview", tpl, "nb.py")
-# or: await ctx.assign_template_to_notebook("overview", tpl, new_notebook="controls")
-
-# Screenshots (headless Chromium; needs `playwright` + chromium):
-png = await ctx.screenshot("chart")  # one cell's output
-png = await ctx.screenshot_deck("overview")  # the deck on its own page
-png = await ctx.screenshot_graph()  # the process graph on the canvas
-await ctx.close_screenshot_session()  # when used outside `async with`
-```
-
-- **Cards reference cells by notebook path** - a cell card id is
-  `"<notebook path>.py-<cell id>"`, where the path is relative to the
-  workspace root (`"nb.py-Hbol"` for a root notebook, `"sub/nb.py-Hbol"` for
-  one in a folder); pass the cell (id, name, index) and `cm` derives the id
-  from the current notebook. Pass the same relative path as `notebook_file`
-  to `assign_template_to_notebook`. Template cards are `"template:<uuid>"`.
-- **Decks are bounded** - a card must fit in `columns` x `rows` and an
-  explicit `position=` must not overlap another card; `cm` raises
-  `ValueError` (naming the blocking card) when it does not fit and
-  `DeckError` when the deck has no free spot left. `add_card_to_deck`
-  refuses a cell that is already on the deck; use `edit_card_on_deck` to move
-  or resize it.
-- **Run before you place** - a deck card shows the cell's output; an unrun
-  cell shows nothing. `screenshot_deck` reloads the deck page, waits for
-  every card's cell state (a few seconds at most) and captures the deck as it
-  is, so a card of a notebook that is not running comes out empty.
-- **Check the result** - use `screenshot_deck` / `screenshot_graph` to verify
-  a layout the way the user will see it. Screenshots return PNG bytes;
-  `as_data_url=True` returns a data URL and `save_to=` also writes the file,
-  on the machine running the kernel (in the cloud, inside the project
-  sandbox). The DataCards cloud images ship `playwright` and Chromium; a
-  local kernel needs `ctx.packages.add("playwright")` and
-  `python -m playwright install chromium`.
-- **Errors** - `DeckError` for an unknown deck, card or template, a server
-  error (the message carries the server's text) or a call outside code mode;
-  `ValueError` for a bad position or size; `ScreenshotError` for a missing
-  browser or a page that did not render. Use `help(ctx.add_card_to_deck)`
-  and friends for the full argument lists.
+The deck, card, template and screenshot API is described in
+[decks.md](reference/decks.md). Read it before placing cards.
 
 ## References
+
+DataCards:
+
+- [product.md](reference/product.md) — how DataCards is meant to be used, the reasons behind the product rules
+- [decks.md](reference/decks.md) — deck, card, template and screenshot API, behavior of building blocks on a deck
+- [deck-design.md](reference/deck-design.md) — laying out a deck that reads well
+- [troubleshooting.md](reference/troubleshooting.md) — the sandbox, reading errors, cleaning up
+- [known-limitations.md](reference/known-limitations.md) — temporary workarounds for platform weaknesses
+
+marimo:
 
 - [execution-context.md](reference/execution-context.md) — scripts, MCP, auth, startup, and shell quoting
 - [finding-marimo.md](reference/finding-marimo.md) — choosing the right marimo invocation
