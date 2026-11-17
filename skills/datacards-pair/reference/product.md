@@ -97,8 +97,9 @@ results that are expensive to recompute) goes to S3 object storage:
 
 1. Ask the user to provision an S3 bucket for the project.
 2. Ask them to hand over the credentials, or to put them in a `.env` file in
-   the workspace. List `.env` in `.gitignore` so the credentials are not
-   committed. Never write credentials into notebook code.
+   the workspace. The `.env` file is committed with the workspace: do not
+   list it in `.gitignore`, or a new sandbox starts without the credentials.
+   Keep credentials in `.env`, not in notebook code.
 3. Use the bucket from notebook code with `obstore`:
 
 ```python

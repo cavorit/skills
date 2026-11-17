@@ -69,8 +69,8 @@ further down and in the reference files. The reasons are in
    user interaction.
 8. **Lasting storage that does not fit git goes to object storage.** Ask the
    user to provision an S3 bucket and hand over the credentials, or to put
-   them in a `.env` file in the workspace (listed in `.gitignore`). Use it
-   from notebook code with `from obstore.store import S3Store`. See
+   them in a `.env` file in the workspace. The `.env` file is committed with
+   the workspace, so a new sandbox has it. Use the bucket from notebook code with `from obstore.store import S3Store`. See
    [product.md](reference/product.md#files-and-storage).
 
 ### Work loop
