@@ -69,7 +69,8 @@ about and what went wrong or took long in it, each point with what it was
 trying to do, what happened, the cause and what would have helped. It shows
 you the report, takes your own remarks, and after your OK posts it as markdown
 to the DataCards team. The report contains the URL of the project the session
-ran on, but no tokens and no project data. Set `DC_FEEDBACK_URL` to send it to a different endpoint.
+ran on, but no tokens and no project data. Set `DC_FEEDBACK_URL` to send it to
+a different endpoint.
 
 ## How the skill is organized
 
