@@ -62,6 +62,41 @@ To opt in to auto-updates (recommended), so you always get the latest version:
 /plugin → Marketplaces → datacards-pair → Enable auto-update
 ```
 
+## Feedback
+
+After a session, run `/dc-feedback`. The agent writes up what the session was
+about and what went wrong or took long in it, each point with what it was
+trying to do, what happened, the cause and what would have helped. It shows
+you the report, takes your own remarks, and after your OK posts it as markdown
+to the DataCards team. The report contains the URL of the project the session
+ran on, but no tokens and no project data. Set `DC_FEEDBACK_URL` to send it to
+a different endpoint.
+
+## How the skill is organized
+
+```
+skills/datacards-pair/
+  SKILL.md                 always loaded: what DataCards is, product rules,
+                           work loop, verification checklist, routing table
+  reference/
+    product.md             how DataCards is meant to be used, the why behind the rules
+    decks.md               deck, card, template and screenshot API,
+                           how building blocks behave on a deck
+    deck-design.md         laying out a deck, independent of the subject
+    troubleshooting.md     the sandbox, reading errors
+    gotchas.md, execution-context.md, finding-marimo.md,
+    notebook-improvements.md, rich-representations.md      from marimo-pair
+skills/dc-feedback/        the /dc-feedback skill
+```
+
+A point enters the skill only if it applies to most projects whatever their
+subject, an agent cannot find it out itself (`help(cm)`,
+`ctx.list_templates()`, an error message), and it is lasting. Knowledge about
+a single domain, library or data source stays out; if such a need keeps coming
+back, it is a candidate for a card-store template. The files taken from
+marimo-pair keep their text; DataCards additions there are marked
+`> **DataCards:**` blocks, so upstream changes can be merged.
+
 ## FAQ
 
 ### I keep getting prompted to allow Bash commands

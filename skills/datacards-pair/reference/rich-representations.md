@@ -2,6 +2,15 @@
 
 Custom visual encodings for data that go beyond standard charts and tables.
 
+> **DataCards:** the product rules in `SKILL.md` come first. In a DataCards
+> project, controls are card-store templates or `dc.ui.*` elements on their
+> own cards, and logic lives in notebook cells. The advice below to prefer
+> anywidget does **not** apply there. Reach for a custom widget only where no
+> building block exists, keep it display-only or to a single small
+> interaction, give it no color scheme of its own, and get the user's
+> agreement first. For a custom picture, prefer SVG or HTML generated in
+> Python over JavaScript.
+
 ## Guiding principles
 
 **Visualization matters.** Helping users build custom visual representations

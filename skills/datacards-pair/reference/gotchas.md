@@ -51,6 +51,13 @@ cells each need their own copy, consolidate them into the setup cell or a
 shared import-only cell (see
 [notebook-improvements.md](notebook-improvements.md#setup-cell)).
 
+## A button without `on_click` has no value
+
+`dc.ui.button(...)` without `on_click` always has the value `None`, so a cell
+reading `button.value` never sees a click. Give it a `value` and an
+`on_click` that returns the next value (for example a click counter that the
+dependent cells read), or use `dc.ui.run_button()`.
+
 ## `inspect.getsource()` on methods is indented
 
 `inspect.getsource()` on a class method preserves the original indentation.
