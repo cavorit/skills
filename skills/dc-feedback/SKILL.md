@@ -61,6 +61,8 @@ Write it in English as markdown to a file, in this shape:
 - Date: YYYY-MM-DD
 - Skill version: <version from the plugin manifest, or "unknown">
 - Agent: <agent and model>
+- Project URL: <the URL the datacards-pair skill connected to in this
+  session, without the token; "unknown" if you cannot tell>
 - Task: <what the user asked for, in two or three sentences>
 - Result: <what exists now: notebooks, decks, cards; finished, partly
   finished or abandoned>
@@ -118,15 +120,20 @@ Rules for the content:
   have prevented is still worth reporting, marked as such.
 - Leave out sections that would be empty.
 
-Keep out of the report: tokens and credentials, the project URL, host names,
-names and e-mail addresses of people, and the project's data or business
-content. Describe the subject of the project in general terms ("a dashboard
-for sensor time series"), and replace such details in quoted messages and
-code with placeholders.
+The project URL belongs in the report: it tells the team which project and
+instance the session ran on. Give it as it was passed to `--url`. If the
+session used several projects, list each one.
+
+Keep out of the report: tokens and credentials (also as part of a URL or a
+quoted command), names and e-mail addresses of people, and the project's data
+or business content. Describe the subject of the project in general terms
+("a dashboard for sensor time series"), and replace such details in quoted
+messages and code with placeholders.
 
 ## 3. Confirm and send
 
-Show the report to the user. Ask two things: whether they want to add or
+Show the report to the user and point out that it contains the project URL.
+Ask two things: whether they want to add or
 change anything, and whether to send it. Put what they add under "Remarks
 from the user" and show the report again if it changed. Send only after a
 clear yes, and send exactly the text the user saw.
