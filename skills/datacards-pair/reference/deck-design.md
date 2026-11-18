@@ -20,8 +20,7 @@ subject of the project.
    much worse than a detailed one. Generate it in Python (for example SVG as
    text), not in JavaScript, and draw single-color parts with `currentColor`
    so that light and dark mode both work.
-3. **Check the template list** for building blocks and
-   [known-limitations.md](known-limitations.md) for their weak spots.
+3. **Check the template list** for building blocks.
 
 ## Cards
 

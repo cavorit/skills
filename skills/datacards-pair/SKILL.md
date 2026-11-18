@@ -164,7 +164,6 @@ Usage, rules and how building blocks behave on a deck are in
 | You want to know why a product rule exists, or how projects, notebooks and the sandbox work | [product.md](reference/product.md) |
 | Before placing cards, using templates or taking screenshots | [decks.md](reference/decks.md) |
 | Before laying out a deck | [deck-design.md](reference/deck-design.md) |
-| Before the first draft of a deck | [known-limitations.md](reference/known-limitations.md) |
 | Something hangs, times out or turns red | [troubleshooting.md](reference/troubleshooting.md) |
 | The script cannot reach or select a session | [execution-context.md](reference/execution-context.md) |
 
@@ -476,7 +475,6 @@ DataCards:
 - [decks.md](reference/decks.md) — deck, card, template and screenshot API, behavior of building blocks on a deck
 - [deck-design.md](reference/deck-design.md) — laying out a deck that reads well
 - [troubleshooting.md](reference/troubleshooting.md) — the sandbox, reading errors, cleaning up
-- [known-limitations.md](reference/known-limitations.md) — temporary workarounds for platform weaknesses
 
 marimo:
 

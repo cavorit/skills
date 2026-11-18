@@ -64,11 +64,12 @@ To opt in to auto-updates (recommended), so you always get the latest version:
 
 ## Feedback
 
-After a session, run `/dc-feedback`. The agent writes lessons learned from the
-session, sorts them into categories, shows you the report and, after your OK,
-posts it as markdown to the DataCards team. The report contains no tokens, no
-project URL and no project data. Set `DC_FEEDBACK_URL` to send it to a
-different endpoint.
+After a session, run `/dc-feedback`. The agent writes up what the session was
+about and what went wrong or took long in it, each point with what it was
+trying to do, what happened, the cause and what would have helped. It shows
+you the report, takes your own remarks, and after your OK posts it as markdown
+to the DataCards team. The report contains no tokens, no project URL and no
+project data. Set `DC_FEEDBACK_URL` to send it to a different endpoint.
 
 ## How the skill is organized
 
@@ -82,22 +83,10 @@ skills/datacards-pair/
                            how building blocks behave on a deck
     deck-design.md         laying out a deck, independent of the subject
     troubleshooting.md     the sandbox, reading errors
-    known-limitations.md   dated workarounds, each with its issue
     gotchas.md, execution-context.md, finding-marimo.md,
     notebook-improvements.md, rich-representations.md      from marimo-pair
 skills/dc-feedback/        the /dc-feedback skill
 ```
-
-Feedback is sorted into these categories, which decide where it goes:
-
-| Category | Meaning | Goes to |
-|----------|---------|---------|
-| `RULE` | Product principle or mandatory work step | `SKILL.md` |
-| `FIX` | Skill text that is wrong or contradicts the product | the file concerned |
-| `REF` | General, lasting knowledge needed at certain moments | a reference file |
-| `TEMP` | Workaround for a platform weakness | `known-limitations.md`, with its issue |
-| `PLATFORM` | Needs product work | an issue, not the skill |
-| `OUT` | Specific to one subject or session | nowhere |
 
 A point enters the skill only if it applies to most projects whatever their
 subject, an agent cannot find it out itself (`help(cm)`,

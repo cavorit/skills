@@ -1,93 +1,134 @@
 ---
 name: dc-feedback
 description: >-
-  Write lessons learned from the current DataCards pairing session and send
-  them, categorized, to the DataCards team. Use when the user runs
-  /dc-feedback or asks to send feedback about the datacards-pair skill or
-  the DataCards platform after working on a project.
+  Write up the lessons learned from the current DataCards pairing session,
+  with enough context to act on them, and send the report to the DataCards
+  team. Use when the user runs /dc-feedback or asks to send feedback about
+  the datacards-pair skill or the DataCards platform after working on a
+  project.
 allowed-tools: Bash(bash **/scripts/send-feedback.sh *), Read, Write
 ---
 
 # DataCards session feedback
 
-Turn what happened in this session into a short lessons-learned report and
-send it to the DataCards team. The team uses these reports to improve the
-`datacards-pair` skill and the platform.
+Write a report about this session and send it to the DataCards team. The team
+uses these reports to improve the `datacards-pair` skill and the platform.
+
+The reader was not in the session and cannot ask you anything. They know
+DataCards well, but not this project, not what the user asked for and not
+what you tried. A point like "screenshots were unreliable" is useless to
+them. A point is useful when they could reproduce the situation from it and
+see what to change. Do not sort or rate the points; the team does that.
 
 The harness reports the absolute path to this `SKILL.md`. Resolve
 `scripts/send-feedback.sh` from its parent directory.
 
-## 1. Collect
+## 1. Go through the session
 
-Go through this session and note what is worth reporting:
+Go through the whole session from the start, not only the last part. If
+earlier parts were summarized, use the summary and say in the report that
+the early part comes from a summary.
 
-- where the skill text was wrong, missing or misleading
-- what the user had to correct or rejected, and why
-- errors and dead ends, with the exact message and what the cause turned out
-  to be
-- workarounds you used
-- what you could not do or could not verify
+Look for these moments:
 
-Only report what happened in this session. Separate what is proven from what
-you assume, and say what you caused yourself. If nothing is worth reporting,
-say so and send nothing.
+- **The user corrected or rejected something.** What had you built or
+  proposed, what did the user say, and what did they want instead?
+- **You were wrong about DataCards.** What did you assume, where did the
+  assumption come from (a passage in the skill, marimo knowledge, a guess),
+  and what turned out to be true?
+- **Something failed or hung.** The call, the exact message, what you tried,
+  and what the cause was.
+- **Something took much longer than it should have.** Where did the time go?
+- **You worked around something.** What did not work as expected, and what
+  did you do instead?
+- **You could not do something** the task needed, or had to ask the user to
+  do it by hand.
+- **The skill helped.** A rule or passage that prevented a mistake is worth
+  one line, so it is not removed later.
 
-## 2. Categorize
+Report only what happened in this session. If nothing is worth reporting,
+tell the user and send nothing.
 
-Give every point exactly one category:
+## 2. Write the report
 
-| Category | Use it for |
-|----------|------------|
-| `RULE` | A product principle or mandatory work step the skill should state. Breaking it got work rejected. |
-| `FIX` | Skill text that is wrong or contradicts the product. Name the file and the passage. |
-| `REF` | General, lasting knowledge an agent needs at certain moments (API behavior, deck craft). |
-| `TEMP` | A workaround for a platform weakness that should disappear once the platform is fixed. |
-| `PLATFORM` | A bug or missing capability of the platform that the skill cannot solve. |
-| `OUT` | Specific to this project's subject or a one-off pattern. Reported for completeness only. |
-
-A point is `RULE`, `FIX` or `REF` only if it would apply to most projects
-whatever their subject, and an agent could not have found it out itself from
-`help(cm)`, `ctx.list_templates()` or an error message. Knowledge about one
-domain, library or data source is `OUT`.
-
-## 3. Write the report
-
-Write it in English as markdown to a file, in this shape. One to three
-sentences per point: what happened, what the consequence was, what would have
-helped.
+Write it in English as markdown to a file, in this shape:
 
 ```markdown
 # DataCards session feedback
 
+## Session
+
 - Date: YYYY-MM-DD
 - Skill version: <version from the plugin manifest, or "unknown">
 - Agent: <agent and model>
-- Session: <one line: what was built, how many notebooks and decks>
+- Task: <what the user asked for, in two or three sentences>
+- Result: <what exists now: notebooks, decks, cards; finished, partly
+  finished or abandoned>
+- Size: <rough duration or number of turns, and how often the user had to
+  correct the direction>
 
-## RULE
-- **<short title>** <what happened, consequence, suggestion>
+## What happened
 
-## FIX
-- **<file>: <short title>** …
+<Five to ten sentences that tell the session in order: the starting state
+of the project, the main steps, where it went off track and how it got
+back. This is the frame the lessons below are read in.>
 
-## REF
-## TEMP
-## PLATFORM
-## OUT
+## Lessons
+
+### <short title that states the point>
+
+- **Situation:** what you were trying to do at that moment, and the state
+  of the project.
+- **What happened:** what you did and what came back. Quote the call and
+  the error message exactly. For a correction, give the user's words.
+- **Cause:** what it turned out to be. Mark it as *confirmed* (say how you
+  confirmed it) or *assumed*.
+- **Cost:** what it cost: turns, rework, a rejected result, a restart.
+- **Resolution:** what you did in the end, or "unresolved".
+- **Would have helped:** the sentence in the skill, the error text or the
+  platform behavior that would have prevented it. If a passage of the
+  skill led you there, name the file and quote the passage.
+
+### <next lesson>
+…
+
+## What worked well
+
+- <rule, passage or platform feature that helped, and where>
 
 ## Not verified
-- <what the agent could not check in this session>
+
+- <what you could not check in this session, and why>
+
+## Remarks from the user
+
+<only if the user adds something in step 3, in their words>
 ```
 
-Leave out empty sections.
+Rules for the content:
 
-Keep out of the report: tokens and credentials, the project URL, names and
-e-mail addresses of people, and the project's data or business content.
-Describe the project's subject in general terms only.
+- Order the lessons by what they cost, the most expensive first.
+- Write one lesson per cause. If the same cause showed up three times, write
+  it once and say it happened three times.
+- Every bullet must hold something specific to this session. Leave a bullet
+  out if you have nothing concrete for it.
+- Include a short code snippet or the relevant lines of an output where the
+  reader needs them to reproduce the point. Keep it to what is needed.
+- Say what you caused yourself. A mistake of yours that the skill could not
+  have prevented is still worth reporting, marked as such.
+- Leave out sections that would be empty.
 
-## 4. Confirm and send
+Keep out of the report: tokens and credentials, the project URL, host names,
+names and e-mail addresses of people, and the project's data or business
+content. Describe the subject of the project in general terms ("a dashboard
+for sensor time series"), and replace such details in quoted messages and
+code with placeholders.
 
-Show the report to the user and ask whether to send it. Send only after a
+## 3. Confirm and send
+
+Show the report to the user. Ask two things: whether they want to add or
+change anything, and whether to send it. Put what they add under "Remarks
+from the user" and show the report again if it changed. Send only after a
 clear yes, and send exactly the text the user saw.
 
 ```bash
