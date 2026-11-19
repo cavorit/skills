@@ -24,6 +24,49 @@ the code, stop rebuilding and check, from the kernel:
 Report cleanly: what is proven, what is an assumption, and what you caused
 yourself.
 
+## A kernel that hangs
+
+A kernel runs one thing at a time. While a cell runs, or a call of yours
+does, every further call waits. Signs: `execute-code.sh` does not return,
+or ends with "Execution did not complete"; the notebook shows a cell that
+has been running for a long time.
+
+1. **Stop the call that waits.** Ending `execute-code.sh` (a timeout, an
+   interrupt) interrupts the kernel, as the stop button in the notebook
+   does. That ends most loops and sleeps.
+2. **Try a small call**, such as `-c "print(1)"`. If it answers, the kernel
+   is back: go on, and fix what blocked.
+3. **Restart the kernel** when it still does not answer. Send the call on
+   its own:
+
+   ```bash
+   bash scripts/execute-code.sh --url <url> --file <path as listed> \
+     -c "import marimo._code_mode as cm; cm.restart_kernel()"
+   ```
+
+   It prints "Kernel restarted". The server carries it out, the kernel is
+   not asked, so this works when nothing else does. With other code in the
+   same call it is not a restart: the kernel gets the call and raises an
+   error that says so.
+
+After a restart the kernel is new: no variables, no imports, no cell has
+run. The notebook's code is unchanged, and the outputs on screen are the
+ones from before the restart until the cells run again. A process that was
+running through the notebook is aborted, with every notebook it was running;
+notebooks outside that process are not affected. Start over with `help(cm)`,
+then run the cells you need. Tell the user that you restarted the kernel,
+and why: what they had in memory is gone too.
+
+Do not restart to get rid of an error message. A restart loses work and
+fixes only a kernel that is stuck or whose state is beyond repair (a
+library that cached a wrong state at import, see
+[gotchas.md](gotchas.md)).
+
+An older DataCards server does not know the call: the kernel answers
+`module 'marimo._code_mode' has no attribute 'restart_kernel'`. Then ask the
+user to restart the kernel from the notebook (the restart button at the
+bottom right, or "Restart kernel" in the command palette).
+
 ## Reading common messages
 
 - **`Timeout waiting for acknowledgment after 5.0 seconds`** on
