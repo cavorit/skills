@@ -24,6 +24,64 @@ the code, stop rebuilding and check, from the kernel:
 Report cleanly: what is proven, what is an assumption, and what you caused
 yourself.
 
+## A kernel that hangs
+
+A kernel runs one thing at a time. While a cell runs, or a call of yours
+does, every further call waits. Signs: `execute-code.sh` does not return,
+or ends with "Execution did not complete"; the notebook shows a cell that
+has been running for a long time.
+
+1. **Stop the call that waits.** Ending `execute-code.sh` (a timeout, an
+   interrupt) interrupts the kernel, as the stop button in the notebook
+   does. That ends most loops and sleeps.
+2. **Try a small call**, such as `-c "print(1)"`. If it answers, the kernel
+   is back: go on, and fix what blocked.
+3. **Restart the kernel** when it still does not answer. Send the call on
+   its own:
+
+   ```bash
+   bash scripts/execute-code.sh --url <url> --file <path as listed> \
+     -c "import marimo._code_mode as cm; cm.restart_kernel()"
+   ```
+
+   It prints "Kernel restarted". The server carries it out, the kernel is
+   not asked, so this works when nothing else does. With other code in the
+   same call it is not a restart: the kernel gets the call and raises an
+   error that says so.
+
+After a restart the kernel is new: no variables, no imports, no cell has
+run. The notebook's code is unchanged, and the outputs on screen are the
+ones from before the restart until the cells run again. A process that was
+running through the notebook fails with it: the notebook shows an error on
+the canvas until its cells run again, and the process starts nothing
+further. Notebooks outside that process are not affected. Start over with
+`help(cm)`, then run the cells you need. Tell the user that you restarted
+the kernel, and why: what they had in memory is gone too.
+
+Do not restart to get rid of an error message. A restart loses work and
+fixes only a kernel that is stuck or whose state is beyond repair (a
+library that cached a wrong state at import, see
+[gotchas.md](gotchas.md)).
+
+## A kernel that died
+
+A kernel can die under a call: a library crashes in native code
+(segmentation fault), the machine runs out of memory, the code calls
+`os._exit`. The call then ends at once, with exit code 1 and a message that
+starts with "The kernel died while the code ran" and names the cause.
+
+There is nothing to restart: DataCards has already given the notebook a
+fresh kernel, and your next call runs in it. As after a restart, it has no
+variables and no imports, and no cell has run in it. The notebook shows an
+error on the canvas until its cells run again, and a process that was
+running through it has failed. A user who has the notebook open sees a
+"Kernel stopped" box with the cause and a Restart button.
+
+Do not send the same code again to see whether it works this time: it kills
+the fresh kernel as well. Find the line first, by running the steps one at a
+time, smallest first. Then tell the user what crashed the kernel, and that
+what they had in memory is gone.
+
 ## Reading common messages
 
 - **`Timeout waiting for acknowledgment after 5.0 seconds`** on
@@ -33,6 +91,9 @@ yourself.
   notebook service restarted and lost its connection. Check whether the same
   line works in another notebook; if it does, the notebook is affected, not
   the code.
+- **`The kernel died while the code ran`**: your call, or a cell that ran at
+  the same time, crashed the kernel. See
+  [A kernel that died](#a-kernel-that-died).
 - **`An ancestor raised an exception`**: a cell upstream failed. Find the
   first failing cell (`ctx.cells[...].errors`); if it is a publish/consume
   timeout, see above.

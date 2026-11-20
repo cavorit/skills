@@ -157,6 +157,31 @@ exposes the DataCards actions a human has in the frontend. They are methods of
 Usage, rules and how building blocks behave on a deck are in
 [decks.md](reference/decks.md).
 
+### Restarting a kernel
+
+When a notebook's kernel hangs (a cell runs forever, every call blocks or
+ends with "Execution did not complete"), restart it. Send this call on its
+own, with nothing else in it:
+
+```bash
+bash /absolute/path/to/datacards-pair/scripts/execute-code.sh \
+  --url <url> --file <path as listed> \
+  -c "import marimo._code_mode as cm; cm.restart_kernel()"
+```
+
+The server restarts the kernel instead of running the call in it. That is
+why it works on a kernel that no longer answers, and why it cannot be
+combined with other code. Everything in memory is lost; the notebook's code
+stays. A process that is running through the notebook fails, and the
+notebook shows an error on the canvas until its cells run again. Afterwards
+start over with `help(cm)`. When to restart, and what to do first, is in
+[troubleshooting.md](reference/troubleshooting.md#a-kernel-that-hangs).
+
+A kernel that died needs no restart. When a call ends with "The kernel died
+while the code ran", DataCards has already replaced the kernel: do not send
+the same code again, and read
+[troubleshooting.md](reference/troubleshooting.md#a-kernel-that-died).
+
 ### Which reference to read when
 
 | When | Read |
