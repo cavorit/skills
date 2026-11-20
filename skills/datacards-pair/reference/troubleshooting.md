@@ -52,20 +52,16 @@ has been running for a long time.
 After a restart the kernel is new: no variables, no imports, no cell has
 run. The notebook's code is unchanged, and the outputs on screen are the
 ones from before the restart until the cells run again. A process that was
-running through the notebook is aborted, with every notebook it was running;
-notebooks outside that process are not affected. Start over with `help(cm)`,
-then run the cells you need. Tell the user that you restarted the kernel,
-and why: what they had in memory is gone too.
+running through the notebook fails with it: the notebook shows an error on
+the canvas until its cells run again, and the process starts nothing
+further. Notebooks outside that process are not affected. Start over with
+`help(cm)`, then run the cells you need. Tell the user that you restarted
+the kernel, and why: what they had in memory is gone too.
 
 Do not restart to get rid of an error message. A restart loses work and
 fixes only a kernel that is stuck or whose state is beyond repair (a
 library that cached a wrong state at import, see
 [gotchas.md](gotchas.md)).
-
-An older DataCards server does not know the call: the kernel answers
-`module 'marimo._code_mode' has no attribute 'restart_kernel'`. Then ask the
-user to restart the kernel from the notebook (the restart button at the
-bottom right, or "Restart kernel" in the command palette).
 
 ## A kernel that died
 
@@ -76,20 +72,15 @@ starts with "The kernel died while the code ran" and names the cause.
 
 There is nothing to restart: DataCards has already given the notebook a
 fresh kernel, and your next call runs in it. As after a restart, it has no
-variables and no imports, no cell has run in it, and a process that was
-running through the notebook is aborted. A user who has the notebook open
-sees a "Kernel stopped" box with the cause and a Restart button.
+variables and no imports, and no cell has run in it. The notebook shows an
+error on the canvas until its cells run again, and a process that was
+running through it has failed. A user who has the notebook open sees a
+"Kernel stopped" box with the cause and a Restart button.
 
 Do not send the same code again to see whether it works this time: it kills
 the fresh kernel as well. Find the line first, by running the steps one at a
 time, smallest first. Then tell the user what crashed the kernel, and that
 what they had in memory is gone.
-
-An older DataCards server gives no message: the call waits until its
-timeout, and the notebook does not answer afterwards. A restart from an
-agent does not help there. Ask the user to restart the kernel from the
-notebook and to reload the page; if `dc.data.publish` and `dc.data.consume`
-time out in that notebook after that, the project has to be restarted.
 
 ## Reading common messages
 

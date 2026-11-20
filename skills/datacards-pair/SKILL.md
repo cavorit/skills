@@ -172,7 +172,8 @@ bash /absolute/path/to/datacards-pair/scripts/execute-code.sh \
 The server restarts the kernel instead of running the call in it. That is
 why it works on a kernel that no longer answers, and why it cannot be
 combined with other code. Everything in memory is lost; the notebook's code
-stays. A process that is running through the notebook is aborted. Afterwards
+stays. A process that is running through the notebook fails, and the
+notebook shows an error on the canvas until its cells run again. Afterwards
 start over with `help(cm)`. When to restart, and what to do first, is in
 [troubleshooting.md](reference/troubleshooting.md#a-kernel-that-hangs).
 
