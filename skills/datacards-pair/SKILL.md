@@ -176,6 +176,11 @@ stays. A process that is running through the notebook is aborted. Afterwards
 start over with `help(cm)`. When to restart, and what to do first, is in
 [troubleshooting.md](reference/troubleshooting.md#a-kernel-that-hangs).
 
+A kernel that died needs no restart. When a call ends with "The kernel died
+while the code ran", DataCards has already replaced the kernel: do not send
+the same code again, and read
+[troubleshooting.md](reference/troubleshooting.md#a-kernel-that-died).
+
 ### Which reference to read when
 
 | When | Read |
